@@ -51,9 +51,12 @@ if (mode === 'sheet' || mode === 'still') {
   };
   const segs = await Promise.all([...Array(parts).keys()].map(work));
   const list = path.join(BUILD, `${id}_segs.txt`); fs.writeFileSync(list, segs.map(s => `file '${s}'`).join('\n'));
-  // traccia audio muta: Instagram gestisce meglio i reel con una traccia audio
-  const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo',
-    '-shortest', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', out], { stdio: 'inherit' });
+  // colonna sonora sintetizzata (promo/music.py), sincronizzata con i tempi del modello
+  const wav = path.join(BUILD, `${id}_music.wav`);
+  const m = spawnSync('python3', [path.join(path.dirname(new URL(import.meta.url).pathname), 'music.py'), wav], { stdio: 'inherit' });
+  if (m.status !== 0) process.exit(m.status);
+  const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', wav,
+    '-shortest', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', out], { stdio: 'inherit' });
   segs.forEach(s => fs.rmSync(s)); fs.rmSync(list);
   if (r.status !== 0) process.exit(r.status);
   console.log(out);

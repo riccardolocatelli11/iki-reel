@@ -66,13 +66,14 @@ Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la r
 
 ## Promo del giovedì (ogni due settimane)
 
-Secondo formato, separato dai reel: il promo nello stile «Il tuo lavoro è allenare. Al resto ci pensa iki.». Telefono 3D che fluttua su fondo nero con bagliori rossi, le **schermate vere dell'app**, card che escono dal telefono, il PT dei reel che salta nello schermo e lancia le card, la cliente che festeggia nell'ultima scena, chiusura con «Concentrati su ciò che conta.» e il logo. 30 secondi, nessuna voce.
+Secondo formato, separato dai reel: il promo nello stile «Il tuo lavoro è allenare. Al resto ci pensa iki.». Telefono 3D che fluttua su fondo nero con bagliori rossi, le **schermate vere dell'app**, card che escono dal telefono, il PT dei reel che salta nello schermo e lancia le card, la cliente che festeggia nell'ultima scena, chiusura con «Concentrati su ciò che conta.» e il logo. 30 secondi, nessuna voce, con la colonna sonora sintetizzata di `promo/music.py` (epica/trap, sincronizzata con i tempi del modello: non serve toccarla).
 
 | Percorso | Cosa contiene |
 |---|---|
 | `promo/template.html` | Il modello: tempi, telefono, card, omini (non toccarlo per un singolo promo) |
 | `promo/omino.js` | Gli omini dei reel portati su canvas (stesse proporzioni di `engine.py`) |
 | `promo/make.py` | Costruisce `build/pNN.html` da `promo/pNN.json`; `grid NOME` fa la griglia per i ritagli |
+| `promo/music.py` | Colonna sonora (aggiunta in automatico da `render.mjs video`) |
 | `promo/render.mjs` | `sheet` (12 fotogrammi), `still t…`, `video` (mp4 1080×1920, 30 fps, circa 10-15 minuti) |
 | `promo/pNN.json` | Un file per promo. `p01.json` è il modello da seguire |
 | `promo/logo/`, `promo/fonts/` | Logo, simbolo (senza capellini), Unbounded, Geist, Geist Mono |
