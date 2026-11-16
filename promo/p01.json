@@ -1,0 +1,190 @@
+{
+ "title": "Promo iki 01 Pagamenti",
+ "intro": "wordmark",
+ "mirror": false,
+ "seed": 11,
+ "hook": {
+  "strike": true,
+  "lines": [
+   [
+    "Rate",
+    "dimenticate."
+   ],
+   [
+    "Solleciti",
+    "imbarazzanti."
+   ],
+   [
+    "Bonifici",
+    "da controllare."
+   ]
+  ],
+  "end": [
+   "Da oggi ti pagano",
+   "dall'app."
+  ]
+ },
+ "crops": {
+  "pg_riepilogo": [
+   "pagamenti",
+   30,
+   615,
+   800,
+   850
+  ],
+  "pg_rata": [
+   "pagamenti",
+   30,
+   1065,
+   800,
+   1315
+  ],
+  "pa_pannello": [
+   "pagamenti-app",
+   30,
+   630,
+   805,
+   1415
+  ],
+  "pa_interruttore": [
+   "pagamenti-app",
+   75,
+   1045,
+   760,
+   1145
+  ],
+  "da_soldi": [
+   "statistiche",
+   30,
+   755,
+   800,
+   1285
+  ]
+ },
+ "scenes": [
+  {
+   "screen": "pagamenti",
+   "eb": "Pagamenti",
+   "t1": "Ogni rata,",
+   "t2": "sotto controllo.",
+   "sub": "Scaduti, prossimi 30 giorni e da incassare: sai sempre a che punto sei.",
+   "cards": [
+    {
+     "type": "img",
+     "src": "pg_riepilogo",
+     "w": 600
+    },
+    {
+     "type": "img",
+     "src": "pg_rata",
+     "w": 600
+    },
+    {
+     "type": "txt",
+     "ic": "bell",
+     "ck": "Notifica",
+     "cv": "Rata in scadenza",
+     "cs": "anche con l'app chiusa"
+    }
+   ]
+  },
+  {
+   "screen": "pagamenti",
+   "tap": [
+    218,
+    1242
+   ],
+   "eb": "Richiedi",
+   "t1": "Un tocco su",
+   "t2": "«Richiedi».",
+   "sub": "Il messaggio per il cliente è già pronto: lo mandi in chat, su WhatsApp o per mail.",
+   "cards": [
+    {
+     "type": "txt",
+     "ic": "chat",
+     "ck": "Messaggio",
+     "cv": "Già scritto",
+     "cs": "da inviare in un tocco"
+    },
+    {
+     "type": "chips",
+     "ck": "Invia con",
+     "chips": [
+      "Chat iki",
+      "WhatsApp",
+      "Mail"
+     ]
+    },
+    {
+     "type": "txt",
+     "ic": "check",
+     "ck": "Bonifico arrivato?",
+     "cv": "Segna pagato",
+     "cs": "e la rata è saldata"
+    }
+   ]
+  },
+  {
+   "screen": "pagamenti-app",
+   "eb": "Pagamenti in app",
+   "t1": "Ti pagano",
+   "t2": "dall'app.",
+   "sub": "Apple Pay, Google Pay, carta o PayPal, sul tuo account Stripe.",
+   "cards": [
+    {
+     "type": "img",
+     "src": "pa_pannello",
+     "w": 560
+    },
+    {
+     "type": "img",
+     "src": "pa_interruttore",
+     "w": 640
+    },
+    {
+     "type": "chips",
+     "ck": "Metodi",
+     "chips": [
+      "Apple Pay",
+      "Google Pay",
+      "Carta",
+      "PayPal"
+     ],
+     "w": 460
+    }
+   ]
+  },
+  {
+   "screen": "statistiche",
+   "eb": "Incassi",
+   "t1": "Si segna",
+   "t2": "pagata da sola.",
+   "sub": "Se il cliente paga dall'app, la rata risulta saldata e ti arriva una notifica.",
+   "cards": [
+    {
+     "type": "img",
+     "src": "da_soldi",
+     "w": 560
+    },
+    {
+     "type": "txt",
+     "ic": "euro",
+     "ck": "Rata pagata",
+     "cv": "In automatico",
+     "cs": "dall'app del cliente"
+    },
+    {
+     "type": "txt",
+     "ic": "bell",
+     "ck": "Per te",
+     "cv": "Una notifica",
+     "cs": "e niente da controllare"
+    }
+   ]
+  }
+ ],
+ "caption": "Rate dimenticate, solleciti imbarazzanti, bonifici da controllare. ❌\n\nCon iki ogni rata è sotto controllo: vedi scaduti, prossimi 30 giorni e da incassare, e con un tocco su «Richiedi» il messaggio per il cliente è già pronto. Se attivi i pagamenti in app, il cliente paga con Apple Pay, Google Pay, carta o PayPal e la rata si segna pagata da sola.\n\nConcentrati su ciò che conta.\n\n👉 Prova gratuita su iki-app.com/personaltrainer (link in bio)\n\niki · L'app del personal trainer\n\n#personaltrainer #personaltraineritalia #coaching #pagamenti #ikiapp",
+ "omini": {
+  "clX": 150
+ }
+}

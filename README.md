@@ -2,7 +2,7 @@
 
 Reel automatici di **@ikiapp.it** (iki, l'app del personal trainer — iki-app.com). Qui stanno il motore degli omini, gli script dei reel, lo storico dei temi e i video pubblicati.
 
-Pubblicazione: **lunedì, mercoledì, venerdì**. Tutto viene fatto da Claude in un'attività programmata; Riccardo non approva i singoli reel.
+Pubblicazione: **lunedì, mercoledì, venerdì** (reel con gli omini) e **un giovedì ogni due settimane** (promo, vedi sotto). Tutto viene fatto da Claude in un'attività programmata; Riccardo non approva i singoli reel.
 
 ## Cartelle
 
@@ -63,3 +63,42 @@ Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la r
 - Non inventare funzioni, numeri di clienti o risultati. I dati nelle schermate sono esempi (cliente «Marco»).
 - Le affermazioni tecniche sull'allenamento devono essere prudenti e condivise («quasi», «di solito»), mai consigli medici.
 - Se un passaggio fallisce (voce, render, hosting, Instagram), **non pubblicare a metà e non ritentare all'infinito**: scrivi cosa è successo e fermati. Mai due reel nello stesso giorno.
+
+## Promo del giovedì (ogni due settimane)
+
+Secondo formato, separato dai reel: il promo nello stile «Il tuo lavoro è allenare. Al resto ci pensa iki.». Telefono 3D che fluttua su fondo nero con bagliori rossi, le **schermate vere dell'app**, card che escono dal telefono, il PT dei reel che salta nello schermo e lancia le card, la cliente che festeggia nell'ultima scena, chiusura con «Concentrati su ciò che conta.» e il logo. 30 secondi, nessuna voce.
+
+| Percorso | Cosa contiene |
+|---|---|
+| `promo/template.html` | Il modello: tempi, telefono, card, omini (non toccarlo per un singolo promo) |
+| `promo/omino.js` | Gli omini dei reel portati su canvas (stesse proporzioni di `engine.py`) |
+| `promo/make.py` | Costruisce `build/pNN.html` da `promo/pNN.json`; `grid NOME` fa la griglia per i ritagli |
+| `promo/render.mjs` | `sheet` (12 fotogrammi), `still t…`, `video` (mp4 1080×1920, 30 fps, circa 10-15 minuti) |
+| `promo/pNN.json` | Un file per promo. `p01.json` è il modello da seguire |
+| `promo/logo/`, `promo/fonts/` | Logo, simbolo (senza capellini), Unbounded, Geist, Geist Mono |
+| `promo/storico.md` | Promo già pubblicati: **leggerlo sempre, non ripetere un tema** |
+
+Serve anche `npm`/Playwright (già installato nell'ambiente: `require('playwright')`).
+
+### Procedura
+
+1. **Quando.** Si pubblica un giovedì sì e uno no. Se in `promo/storico.md` c'è un promo di meno di 10 giorni fa, oggi non tocca: fermati e dillo in una riga. Mai due video nello stesso giorno.
+2. **Tema.** Se in `promo/` c'è già un `pNN.json` pronto che non compare in `promo/storico.md` (preparato in anticipo), usa quello: ricontrolla solo che schermate e frasi siano ancora fedeli all'app e vai al passo 5. Altrimenti scegli una sola area di iki per promo (pagamenti, schede, clienti e anamnesi, progressi e check, dashboard e incassi, allenamento del cliente con timer e video esercizi, chat, novità rilasciate da poco). Non ripetere quelle di `promo/storico.md`; le novità recenti dell'app hanno la precedenza.
+3. **Fedeltà all'app.** Clona `riccardolocatelli11/gestionale-pt`. Le schermate sono `public/pt-vetrina-<NOME>.png` (aggiornate da Riccardo): usa solo quelle. Ogni frase e ogni card deve corrispondere a qualcosa che **trovi nel codice** di `src/` (etichette, testi dei bottoni, comportamento). Se una funzione non c'è nelle schermate o nel codice, non mostrarla. Se le schermate disponibili non bastano per un tema, scegli un altro tema.
+4. **Configurazione `promo/pNN.json`** (copia `p01.json`):
+   - `hook.lines`: 3 righe «problema» (parola bianca + parola grigia), barrate in rosso; `hook.end`: la risposta su 2 righe (la seconda è al neon, 1-3 parole).
+   - `scenes`: esattamente 4. Ognuna ha `screen` (nome dopo `pt-vetrina-`), `eb` (occhiello), `t1`/`t2` (titolo su 2 righe, la seconda al neon, massimo ~18 caratteri per riga), `sub` (una frase), `cards` (3 card) e facoltativo `tap` ([x, y] nelle coordinate della griglia) per il tocco sullo schermo.
+   - Card: `img` (ritaglio definito in `crops`: `[schermata, x0, y0, x1, y1]`, coordinate della griglia, larghezza 832), `txt` (`ic`, `ck` occhiello, `cv` valore, `cs` sotto), `chips` (`ck` e lista), `vid` (video esercizio da `public/video/NOME.mp4`).
+   - Icone `ic`: check, trend, euro, bell, cam, users, flame, clock, card, play, doc, chat, star.
+   - `intro`: alterna `wordmark` e `symbol`; `mirror`: alterna `false` e `true`; `seed`: un numero qualsiasi diverso dal precedente.
+   - `omini` facoltativo: `{"pt": true, "cliente": true, "ptX": 350, "clX": 330, "ground": 900}` (posizioni nello schermo, 474 px di larghezza). Sposta `clX`/`ptX` se l'omino copre una card o un dato importante.
+   - `caption`: la didascalia (vedi sotto).
+   - Per scegliere i ritagli: `python3 promo/make.py grid NOME` e guarda `build/grid_NOME.png`.
+5. **Controllo.** `IKI_APP=../gestionale-pt python3 promo/make.py promo/pNN.json`, poi `node promo/render.mjs build/pNN.html sheet` e guarda `build/sheet_pNN.png`; per una scena `still 11 15.2 20.4 25.2`. Controlla: ritagli giusti (niente pezzi di altre righe), testi interi e non sovrapposti, omini che non coprono le card. Correggi e ripeti.
+6. **Render.** `node promo/render.mjs build/pNN.html video "out/Promo iki - NN - TITOLO.mp4"`. Controlla durata (30 s) e due fotogrammi con ffmpeg.
+7. **Video online e pubblicazione.** Come per i reel (passi 9-10 sopra), ma con il file `pNN.mp4` sul ramo `video`. `share_to_feed: true`.
+8. **Chiusura.** Riga in `promo/storico.md` (numero, data, tema, schermate, permalink); commit su `main` di `promo/pNN.json` e `promo/storico.md`.
+
+### Didascalia del promo
+
+Prima riga: i tre problemi del gancio + ❌. Poi 2-3 righe su cosa fa iki per quel tema (solo funzioni verificate). Poi «Concentrati su ciò che conta.», «👉 Prova gratuita su iki-app.com/personaltrainer (link in bio)», «iki · L'app del personal trainer» e 5 hashtag. Nessuna parola CTA da commentare.
