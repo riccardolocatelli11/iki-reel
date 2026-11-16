@@ -10,3 +10,4 @@ Cliente che molla alla terza settimana · dolori due giorni dopo · la bilancia 
 
 | N | Data | Tema | Funzione iki mostrata | Parola CTA | Link |
 |---|---|---|---|---|---|
+| 29 | 16/11/2026 | Ogni serie a cedimento? (fermarsi 1-2 rep prima, cedimento solo sull'ultima serie di isolamento) | Domanda "Com'è andata?" a fine esercizio (Facile/Giusto/Duro/Al limite) | SFORZO | https://www.instagram.com/reel/DfzqEHDEZb4/ |
