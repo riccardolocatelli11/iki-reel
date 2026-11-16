@@ -734,7 +734,8 @@ def _align_energy(mod, x):
 def _align_words(mod, tr):
     """Con la trascrizione (parole con start/end): abbina le parole del copione a quelle sentite."""
     heard = [(clean(w.get('text', w.get('word', ''))), float(w['start'])) for w in tr
-             if w.get('type', 'word') == 'word' and clean(w.get('text', w.get('word', '')))]
+             if w.get('type', 'word') == 'word' and not str(w.get('text', w.get('word', ''))).startswith('[')
+             and clean(w.get('text', w.get('word', '')))]
     script = [clean(w) for s, *_ in mod.SENT for w in s.split()]
     sm = difflib.SequenceMatcher(None, script, [h[0] for h in heard], autojunk=False)
     t = [None] * len(script)
