@@ -1002,6 +1002,44 @@ def build_audio(tl, path):
     wavfile.write(path, SR, (mix * 32767).astype(np.int16))
 
 # ================================================================ main
+
+# ================================================================ copertina
+COVER_HOOK_Y = 560            # centro del gancio: resta intero nel ritaglio 3:4 della griglia (y 240-1680)
+
+def cover_hook(ctx, lines, y=COVER_HOOK_Y, size=175, cc=RED, sc=INK):
+    ctx.select_font_face(FONT)
+    for ln in lines:
+        ctx.set_font_size(175); size = min(size, 175 * 960 / max(ctx.text_extents(ln).width, 1))
+    ctx.save(); ctx.translate(540, y); ctx.rotate(-.025)
+    for i, ln in enumerate(lines):
+        yy = (i - (len(lines) - 1) / 2) * size * 1.08
+        text(ctx, ln, 0, yy + 11, size, FONT, sc, stroke=sc, sw=size * .16)
+        text(ctx, ln, 0, yy, size, FONT, cc, stroke=sc, sw=size * .13)
+    ctx.restore()
+
+def render_cover(hook, draw, path, dark=False):
+    """Copertina 1080x1920: fondo carta (o nero), disegno della scena spostato in basso, gancio grande in alto.
+    draw(ctx) disegna la scena come nel reel (coordinate 1080x1920)."""
+    from PIL import Image
+    s = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H); ctx = cairo.Context(s); ctx.set_antialias(cairo.ANTIALIAS_GOOD)
+    if dark:
+        col(ctx, (0.039, 0.039, 0.047)); ctx.paint()
+    else:
+        paper, _keep = make_paper(); ctx.set_source_surface(paper, 0, 0); ctx.paint()
+    ctx.save(); ctx.translate(540, 1225); ctx.scale(.92, .92); ctx.translate(-540, -1060); draw(ctx); ctx.restore()
+    if hook: cover_hook(ctx, hook.split('\n') if isinstance(hook, str) else hook, sc=INK)
+    s.flush()
+    a = np.frombuffer(s.get_data(), np.uint8).reshape(H, W, 4)[..., [2, 1, 0]]
+    Image.fromarray(a.copy()).save(path, quality=92); return path
+
+def cover_for(mod, tl, rid):
+    """COVER = funzione (ctx) opzionale nello script; altrimenti la prima scena a 0,8 s."""
+    draw = getattr(mod, 'COVER', None)
+    if draw is None:
+        sc = tl.scenes[0]; f = mod.SCENES[sc['fn']]
+        draw = lambda ctx: f(ctx, min(.8, sc['L'] * .5), sc['L'], sc['wt'])
+    return render_cover(getattr(mod, 'COVER_HOOK', mod.HOOK), draw, os.path.join(HERE, 'out', f'cover_{rid}.jpg'))
+
 def main(mod, rid):
     os.chdir(HERE); os.makedirs('build', exist_ok=True); os.makedirs('out', exist_ok=True)
     tl = Timeline(mod, rid); args = sys.argv[1:]
@@ -1011,6 +1049,8 @@ def main(mod, rid):
         return
     if args and args[0] == 'still':
         return stills(tl, [float(a) for a in args[1:]], f'still_{rid}.png')
+    if args and args[0] == 'cover':
+        print('scritto', cover_for(mod, tl, rid)); return
     if args and args[0] == 'sheet':
         ts = [.15, min(1.0, tl.hook_out * .6)]
         for s in tl.scenes: ts += [s['start'] + s['L'] * .35, s['start'] + s['L'] * .85]
