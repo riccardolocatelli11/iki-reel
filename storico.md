@@ -11,3 +11,4 @@ Cliente che molla alla terza settimana · dolori due giorni dopo · la bilancia 
 | N | Data | Tema | Funzione iki mostrata | Parola CTA | Link |
 |---|---|---|---|---|---|
 | 29 | 16/11/2026 | Ogni serie a cedimento? (fermarsi 1-2 rep prima, cedimento solo sull'ultima serie di isolamento) | Domanda "Com'è andata?" a fine esercizio (Facile/Giusto/Duro/Al limite) | SFORZO | https://www.instagram.com/reel/DfzqEHDEZb4/ |
+| 30 | 18/11/2026 | Massimale testato con una ripetizione secca? (stimarlo da 3-5 rep pulite, poi lavorare in percentuale e aggiornarlo a ogni ciclo) | Massimali del cliente + carico in % nella scheda (il cliente vede "75% · 82,5 kg") | MASSIMALE | https://www.instagram.com/reel/Df4jQTQiPwp/ |
