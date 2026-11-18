@@ -15,7 +15,8 @@ Pubblicazione: **lunedì, mercoledì, venerdì** (reel con gli omini) e **un gio
 | `esempi/` | Script dei reel 15, 19, 21, 24 originali, come riferimento di scene e oggetti |
 | `audio_in/NN.mp3`, `NN.json` | Voce del reel e parole con i tempi (trascrizione) |
 | `storico.md` | Temi già pubblicati: **leggerlo sempre, non ripetere un tema** |
-| ramo `video` | Solo l'mp4 dell'ultimo reel, da cui Instagram lo scarica |
+| `copertine_archivio.py` | Copertine dei reel pubblicati prima del 18/11/2026 (da caricare a mano dall'app) e copertina scura dei promo |
+| ramo `video` | Solo l'mp4 e la copertina (jpg) dell'ultimo reel, da cui Instagram li scarica |
 
 ## Preparare l'ambiente
 
@@ -41,15 +42,16 @@ Serve `ffmpeg`.
 6. **Voce.** ElevenLabs, voce «Riccardo» `voice_id KoYZY2uFp4KixfrIYJPt`, modello `eleven_v4`, **una sola generazione** (`generations_count: 1`). Tag di tono tra parentesi quadre (`[incredulous]`, `[confident]`, `[serious]`, `[excited]`, `[cheerfully]`): energica ed esplosiva nei punti giusti, **mai urlata**. Scarica l'mp3 in `audio_in/NN.mp3`.
 7. **Tempi.** Trascrivi l'audio (`creative_transcribe_audio`) e salva le parole in `audio_in/NN.json` (lista di `{text, start, end}`). Poi `python3 rNN.py times` e di nuovo `sheet`: le parole chiave devono cadere nella scena giusta. Senza json il motore si aggancia alle pause, meno preciso.
 8. **Render.** `python3 rNN.py` → `out/Reel iki - NN - TITOLO.mp4` (1080×1920, 30 fps, circa 30 secondi di calcolo). Controlla durata e alcuni fotogrammi con `still`.
+   **Copertina.** `python3 rNN.py cover` → `out/cover_NN.jpg`: fondo carta, gancio grande e la prima scena a 0,8 s, impaginati perché il gancio resti intero nel ritaglio 3:4 della griglia del profilo (si vede solo la fascia y 240-1680). Guardala: gancio leggibile, niente testo sotto il gancio. Se la prima scena non rende, definisci nello script `COVER = lambda ctx: s2(ctx, 1.0, 3.0, {})` (o una scena apposta); `COVER_HOOK` cambia il testo se il gancio del video è troppo lungo.
 9. **Video online.** Ramo orfano `video` con il solo file, spinto con `--force`:
    ```bash
    rm -rf /tmp/vid && mkdir /tmp/vid && cd /tmp/vid && git init -q -b video
-   cp "<mp4>" rNN.mp4 && git add rNN.mp4 && git commit -q -m "Reel NN"
+   cp "<mp4>" rNN.mp4 && cp out/cover_NN.jpg rNN.jpg && git add rNN.mp4 rNN.jpg && git commit -q -m "Reel NN"
    git remote add origin https://github.com/riccardolocatelli11/iki-reel && git push -f origin video
    ```
-   Indirizzo: `https://raw.githubusercontent.com/riccardolocatelli11/iki-reel/video/rNN.mp4`
+   Indirizzi: `https://raw.githubusercontent.com/riccardolocatelli11/iki-reel/video/rNN.mp4` e, per la copertina, `.../video/rNN.jpg`
 10. **Pubblicazione.** Composio, account `instagram_orthis-postil`, `ig_user_id 29071061522583210`:
-    `INSTAGRAM_POST_IG_USER_MEDIA` (`video_url`, `media_type: REELS`, `caption`, `share_to_feed: true`), poi attendi `FINISHED` con `INSTAGRAM_GET_POST_STATUS` (servono circa 4 minuti: riprova ogni 30-40 secondi, fino a 8 minuti), poi `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH`. Prendi il permalink con `INSTAGRAM_GET_IG_MEDIA`.
+    `INSTAGRAM_POST_IG_USER_MEDIA` (`video_url`, `cover_url` = l'indirizzo di `rNN.jpg`, `media_type: REELS`, `caption`, `share_to_feed: true`), poi attendi `FINISHED` con `INSTAGRAM_GET_POST_STATUS` (servono circa 4 minuti: riprova ogni 30-40 secondi, fino a 8 minuti), poi `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH`. Prendi il permalink con `INSTAGRAM_GET_IG_MEDIA`.
 11. **Chiusura.** Aggiungi una riga a `storico.md`, fai commit di `rNN.py`, `audio_in/NN.*` e `storico.md` su `main`.
 
 ## Didascalia
@@ -97,7 +99,7 @@ Serve anche `npm`/Playwright (già installato nell'ambiente: `require('playwrigh
    - Per scegliere i ritagli: `python3 promo/make.py grid NOME` e guarda `build/grid_NOME.png`.
 5. **Controllo.** `IKI_APP=../gestionale-pt python3 promo/make.py promo/pNN.json`, poi `node promo/render.mjs build/pNN.html sheet` e guarda `build/sheet_pNN.png`; per una scena `still 11 15.2 20.4 25.2`. Controlla: ritagli giusti (niente pezzi di altre righe), testi interi e non sovrapposti, omini che non coprono le card. Correggi e ripeti.
 6. **Render.** `node promo/render.mjs build/pNN.html video "out/Promo iki - NN - TITOLO.mp4"`. Controlla durata (30 s) e due fotogrammi con ffmpeg.
-7. **Video online e pubblicazione.** Come per i reel (passi 9-10 sopra), ma con il file `pNN.mp4` sul ramo `video`. `share_to_feed: true`.
+7. **Video online e pubblicazione.** Come per i reel (passi 9-10 sopra), ma con i file `pNN.mp4` e `pNN.jpg` sul ramo `video`. `share_to_feed: true`. Copertina scura: `python3 copertine_archivio.py brand 'GANCIO\nRIGA DUE' out/cover_pNN.jpg` con la frase principale del promo (es. «IL TUO LAVORO\nÈ ALLENARE.»), poi `cover_url`.
 8. **Chiusura.** Riga in `promo/storico.md` (numero, data, tema, schermate, permalink); commit su `main` di `promo/pNN.json` e `promo/storico.md`.
 
 ### Didascalia del promo
