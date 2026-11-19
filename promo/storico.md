@@ -5,3 +5,4 @@ Formato «Il tuo lavoro è allenare. Al resto ci pensa iki.»: telefono 3D con l
 | N | Data | Tema | Schermate usate | Link |
 |---|---|---|---|---|
 | 00 | 14/10/2026 | Lancio: clienti, schede, pagamenti, lato cliente | (disegnate a mano, non dal modello) | pubblicato a mano |
+| 01 | 19/11/2026 | Pagamenti: rate sotto controllo, «Richiedi», pagamenti in app, rata pagata da sola | pagamenti, pagamenti-app, statistiche | https://www.instagram.com/reel/Df7Hm3BApvr/ |
