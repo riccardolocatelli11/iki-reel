@@ -14,7 +14,7 @@ def cta_card(ctx, word, k, y=640, t=0.0):
     rrect(ctx, -w / 2, -h / 2, w, h, 46); fill_stroke(ctx, WHITE, 9)
     text(ctx, 'SCRIVI', -60, -88, 46, FONT, INK)
     ctx.select_font_face(FONT); ctx.set_font_size(104); tw = ctx.text_extents(f'«{word}»').width
-    sz = 104 * min(1, 600 / max(tw, 1))
+    sz = 104 * min(1, 540 / max(tw, 1))
     text(ctx, f'«{word}»', -60, 6, sz, FONT, RED, stroke=INK, sw=10)
     text(ctx, 'NEI COMMENTI', -60, 98, 46, FONT, INK)
     # icona commento che rimbalza
