@@ -358,3 +358,27 @@ def plate_stack(ctx, c, n, s=1.0):
         ell(ctx, 0, -i * 34, 130, 34); fill_stroke(ctx, DARK, 6)
         ell(ctx, 0, -i * 34 - 6, 26, 8); col(ctx, (.5, .5, .5)); ctx.fill()
     ctx.restore()
+
+# ---------------------------------------------------------------- CTA «salva» (alternata alla CTA commenti)
+def save_card(ctx, k, y=640, t=0.0, top='SALVA', big='IL VIDEO', sub='PER LA PROSSIMA SCHEDA'):
+    """Scheda finale per i reel con CTA «salva»: stessa forma di cta_card, con il segnalibro di Instagram."""
+    if k <= 0: return
+    ctx.save(); ctx.translate(540, y); sscale(ctx, eback(clamp(k)))
+    ctx.rotate(-.02 + .008 * math.sin(t * 3))
+    w, h = 900, 300
+    rrect(ctx, -w / 2 + 10, -h / 2 + 14, w, h, 46); col(ctx, INK, .18); ctx.fill()
+    rrect(ctx, -w / 2, -h / 2, w, h, 46); fill_stroke(ctx, WHITE, 9)
+    text(ctx, top, -70, -88, 46, FONT, INK)
+    ctx.select_font_face(FONT); ctx.set_font_size(104); tw = ctx.text_extents(big).width
+    sz = 104 * min(1, 540 / max(tw, 1))
+    text(ctx, big, -70, 6, sz, FONT, RED, stroke=INK, sw=10)
+    ctx.select_font_face(FONT); ctx.set_font_size(40); sw_ = ctx.text_extents(sub).width
+    text(ctx, sub, -70, 98, 40 * min(1, 600 / max(sw_, 1)), FONT, INK)
+    # segnalibro che rimbalza e si riempie
+    bx, by = 330, -6 + 10 * math.sin(t * 6)
+    fillk = clamp((t % 2.0) / .5) if (t % 2.0) < 1.6 else 1 - clamp(((t % 2.0) - 1.6) / .4)
+    ctx.move_to(bx - 62, by - 88); ctx.line_to(bx + 62, by - 88); ctx.line_to(bx + 62, by + 88)
+    ctx.line_to(bx, by + 40); ctx.line_to(bx - 62, by + 88); ctx.close_path()
+    fill_stroke(ctx, RED if fillk > .5 else WHITE, 9)
+    if fillk > .5: check(ctx, (bx, by - 20), .5, WHITE)
+    ctx.restore()
