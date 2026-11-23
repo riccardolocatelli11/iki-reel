@@ -382,3 +382,26 @@ def save_card(ctx, k, y=640, t=0.0, top='SALVA', big='IL VIDEO', sub='PER LA PRO
     fill_stroke(ctx, RED if fillk > .5 else WHITE, 9)
     if fillk > .5: check(ctx, (bx, by - 20), .5, WHITE)
     ctx.restore()
+
+def send_card(ctx, k, y=640, t=0.0, top='MANDALO', big='A UN COLLEGA', sub='CHE LO FA ANCORA'):
+    """Scheda finale per i reel con CTA «invia» (la CTA che Instagram premia di più per gli account nuovi): aeroplanino dei DM."""
+    if k <= 0: return
+    ctx.save(); ctx.translate(540, y); sscale(ctx, eback(clamp(k)))
+    ctx.rotate(-.02 + .008 * math.sin(t * 3))
+    w, h = 900, 300
+    rrect(ctx, -w / 2 + 10, -h / 2 + 14, w, h, 46); col(ctx, INK, .18); ctx.fill()
+    rrect(ctx, -w / 2, -h / 2, w, h, 46); fill_stroke(ctx, WHITE, 9)
+    text(ctx, top, -70, -88, 46, FONT, INK)
+    ctx.select_font_face(FONT); ctx.set_font_size(96); tw = ctx.text_extents(big).width
+    text(ctx, big, -80, 6, 96 * min(1, 520 / max(tw, 1)), FONT, RED, stroke=INK, sw=10)
+    ctx.select_font_face(FONT); ctx.set_font_size(40); sw_ = ctx.text_extents(sub).width
+    text(ctx, sub, -70, 98, 40 * min(1, 600 / max(sw_, 1)), FONT, INK)
+    # aeroplanino che parte e torna
+    ph = (t % 1.6) / 1.6
+    dx = 25 * eio(clamp(ph * 2)) - 25 * eio(clamp(ph * 2 - 1)); dy = -25 * math.sin(ph * math.pi)
+    ctx.save(); ctx.translate(330 + dx, -5 + dy); ctx.rotate(-.35); ctx.scale(.75, .75)
+    ctx.move_to(-80, 0); ctx.line_to(85, -70); ctx.line_to(30, 75); ctx.line_to(5, 15); ctx.close_path()
+    fill_stroke(ctx, RED, 8)
+    ctx.move_to(5, 15); ctx.line_to(85, -70); ctx.set_line_width(7); col(ctx, INK); ctx.stroke()
+    ctx.restore()
+    ctx.restore()

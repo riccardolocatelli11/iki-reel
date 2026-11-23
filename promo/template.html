@@ -322,7 +322,7 @@ let curScr=-1;
 function render(t){
   const flashV=Math.max(bump(t,2.98,.28)*.9,bump(t,6.95,.3)*.55,bump(t,12.55,.25)*.75,bump(t,17.5,.2)*.35,bump(t,22.65,.25)*.8,bump(t,26.75,.3)*.6);
   flash.style.opacity=flashV;
-  black.style.opacity=Math.max(1-P(t,0,.45),P(t,29.6,30));
+  black.style.opacity=Math.max(C.coldOpen===false?1-P(t,0,.45):0,P(t,29.6,30));
   grain.style.backgroundPosition=`${(t*977)%240|0}px ${(t*631)%240|0}px`;
   const pulse=.75+.25*Math.sin(t*2.2);
   g1.style.transform=`translate(${-110+Math.sin(t*.35)*180*MIR}px,${-80+Math.cos(t*.28)*220}px) scale(${1+flashV*.3})`;
@@ -337,11 +337,16 @@ function render(t){
   else if(t>6.6&&t<7.2){streak.style.opacity=Math.sin(sk2*Math.PI);streak.style.transform=`translate(${L(1080,-900,E.io(sk2))}px,1180px)`;}
   else streak.style.opacity=0;
 
-  if(C.intro==='symbol') lg.forEach(el=>tw(el,t,{a:.5,d:1.3,s0:.35,b0:40,r0:-90*MIR,z:2.72,zd:.4,s1:4.5,b1:36}));
+  /* coldOpen (predefinito): il gancio parte dal primo fotogramma, senza logo iniziale.
+     Il promo 01 con il logo in apertura perdeva l'86% delle persone nel primo secondo. */
+  const COLD=C.coldOpen!==false;
+  if(COLD){ lg.forEach(el=>{el.style.opacity=0;}); pay1.style.opacity=0; }
+  else if(C.intro==='symbol') lg.forEach(el=>tw(el,t,{a:.5,d:1.3,s0:.35,b0:40,r0:-90*MIR,z:2.72,zd:.4,s1:4.5,b1:36}));
   else lg.forEach((el,i)=>tw(el,t,{a:.55+i*.17,d:1,s0:2.4,b0:46,dy:-30,z:2.72+i*.03,zd:.4,s1:4.5,b1:36}));
-  tw(pay1,t,{a:1.55,d:.9,dy:40,b0:16,z:2.6,zd:.35,oy:60,b1:16});
+  if(!COLD) tw(pay1,t,{a:1.55,d:.9,dy:40,b0:16,z:2.6,zd:.35,oy:60,b1:16});
 
-  h2.forEach((el,i)=>tw(el,t,{a:3.15+i*.42,d:.75,dy:110,b0:30,s0:1.06,z:5.65+i*.05,zd:.35,oy:-60,b1:20}));
+  h2.forEach((el,i)=>tw(el,t,COLD?{a:i?i*.45:-.1,d:i?.5:.01,dy:i?80:0,b0:i?20:0,s0:1,z:5.65+i*.05,zd:.35,oy:-60,b1:20}
+                              :{a:3.15+i*.42,d:.75,dy:110,b0:30,s0:1.06,z:5.65+i*.05,zd:.35,oy:-60,b1:20}));
   strikes.forEach((el,i)=>{el.style.transform=`scaleX(${E.expo(P(t,4.75+i*.15,5.15+i*.15)).toFixed(3)})`;});
   if(C.hook.strike) h2.forEach((el,i)=>{el.querySelector('.mut').style.color=P(t,4.8+i*.15,5.0+i*.15)>.5?'#5a4646':'#8d7777';});
   tw(hookEnd,t,{a:5.95,d:.7,s0:.75,b0:30,z:6.72,zd:.35,s1:2.8,b1:40});

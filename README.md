@@ -2,7 +2,7 @@
 
 Reel automatici di **@ikiapp.it** (iki, l'app del personal trainer — iki-app.com). Qui stanno il motore degli omini, gli script dei reel, lo storico dei temi e i video pubblicati.
 
-Pubblicazione: **lunedì, mercoledì, venerdì** (reel con gli omini) e **un giovedì ogni due settimane** (promo, vedi sotto). Tutto viene fatto da Claude in un'attività programmata; Riccardo non approva i singoli reel.
+Pubblicazione: **lunedì, mercoledì, venerdì** (reel con gli omini), **martedì** (carosello, vedi sotto) e **un giovedì ogni due settimane** (promo, vedi sotto). Tutto viene fatto da Claude in un'attività programmata; Riccardo non approva i singoli reel.
 
 ## Cartelle
 
@@ -29,7 +29,11 @@ Serve `ffmpeg`.
 
 ## Procedura per un reel
 
+0. **Misure dei reel passati.** Prima di tutto aggiorna `metriche.md` (vedi la sezione «Metriche» sotto) per i reel pubblicati da almeno 7 giorni che non ci sono ancora. Leggila: i temi e le CTA che portano più **invii** (shares) e follower vanno ripetuti, quelli con skip alto evitati.
 1. **Tema.** Leggi `storico.md` e scegli un tema nuovo. Formato che rende di più: un mito o un errore tecnico dell'allenamento o della gestione dei clienti, smentito, con una regola pratica che il PT può usare domani. Dai numeri del profilo (vedi «Cosa dicono i numeri» sotto): meglio i temi **tecnici di programmazione** con una regola **concreta e riutilizzabile, possibilmente con un numero** (quando aumentare il carico, quante serie, quanto recupero, quante ripetizioni in riserva): sono quelli che vengono salvati e condivisi. Evita i temi emotivi o generici (bilancia, specchio, motivazione) e i reel che parlano dell'app fin dall'inizio: l'app arriva solo nella frase su iki.
+   **Due aree, alternate.** I temi di solo allenamento attirano anche chi va in palestra e non fa il PT (il 98% della copertura è di non follower, ma non diventano follower). Quindi alterna, guardando la colonna «Area» dell'ultima riga di `storico.md`:
+   - **Mestiere** (se l'ultimo era Allenamento): un errore nella gestione dei clienti o del lavoro da PT, sempre come mito smentito con una regola pratica. Esempi: disdette all'ultimo minuto, clienti che spariscono dopo un mese, prezzi e pacchetti, rate e solleciti, primo colloquio, messaggi a tutte le ore, check settimanali, rinnovi. Sono i temi che un PT **manda a un collega**, e li guarda solo chi fa il PT (i due di prova, «Rispondi ai clienti alle 23?» e «Al cliente nuovo mandi la scheda il giorno dopo?», sono tra i primi 6 per copertura).
+   - **Allenamento** (se l'ultimo era Mestiere): programmazione tecnica con una regola numerica, detta dal punto di vista del PT che la applica ai clienti («Il tuo cliente…»), non del palestrato.
 2. **Fedeltà all'app.** Clona `riccardolocatelli11/gestionale-pt` (è sempre in aggiornamento) e cerca nel codice (`src/`) la funzione di iki da mostrare. Cita solo ciò che trovi nel codice; la schermata disegnata deve avere etichette e struttura reali. Se non trovi una funzione adatta, cambia tema.
 3. **Testo.** 7-9 frasi, 380-480 caratteri, 25-35 secondi. Struttura:
    - frase 1: domanda tecnica (è anche il gancio rosso `HOOK`, tutto maiuscolo, 2 righe);
@@ -37,8 +41,8 @@ Serve `ffmpeg`.
    - 2-3 frasi con la spiegazione e la regola pratica;
    - 1 frase su iki (dopo metà video);
    - ultima frase: la CTA, **alternata** da un reel all'altro. Guarda la colonna «Parola CTA» dell'ultima riga di `storico.md`:
-     - se l'ultimo reel aveva una parola da commentare → questo è un reel **«salva»**: ultima frase «Salva il video, così ce l'hai per la prossima scheda.» con `save_card(ctx, k, 660, tau)` al posto di `cta_card`; nello storico, nella colonna «Parola CTA», scrivi `— (salva)`;
-     - se l'ultimo reel era un reel «salva» → questo ha la parola: «Scrivi «PAROLA» nei commenti, e ti mando come funziona.» con `cta_card` (Riccardo risponde a mano ai commenti).
+     - se l'ultimo reel aveva una parola da commentare → questo è un reel **«invia»**: ultima frase «Mandalo al collega che lo fa ancora.» (o una variante adatta al tema, sempre con «manda/mandalo a un collega») con `send_card(ctx, k, 660, tau)` al posto di `cta_card`; nello storico, nella colonna «Parola CTA», scrivi `— (invia)`. Gli invii in DM sono il segnale che Instagram premia di più per gli account nuovi;
+     - se l'ultimo reel era un reel «invia» (o «salva») → questo ha la parola: «Scrivi «PAROLA» nei commenti, e ti mando come funziona.» con `cta_card`. **Scrivi anche `dm/PAROLA.md`** (vedi `dm/README.md`): è il messaggio che parte da solo in DM a chi commenta. Solo funzioni verificate nel codice, link iki-app.com/personaltrainer, firma «Riccardo».
 4. **Script `rNN.py`.** Copia la struttura di `r29.py`: `TITLE`, `HOOK`, `LOOP`, `TAIL`, `SENT`, una funzione di scena per frase, `SCENES`, `SFX`. Ogni voce di `SENT` è `(frase, 'sN', {PAROLE ROSSE}, pausa)`. In ogni scena deve muoversi qualcosa ogni 1-2 secondi e l'oggetto principale occupa almeno un terzo dello schermo. Zona utile: y da 560 a 1500 (in alto ci sono gancio e parole, in basso l'interfaccia di Instagram).
 5. **Controllo prima della voce.** `python3 rNN.py sheet` e guarda `build/sheet_NN.png`: niente sovrapposizioni, niente testo tagliato, facce giuste. Correggi finché è pulito. Così non si sprecano crediti.
 6. **Voce.** ElevenLabs, voce «Riccardo» `voice_id KoYZY2uFp4KixfrIYJPt`, modello `eleven_v4`, **una sola generazione** (`generations_count: 1`). Tag di tono tra parentesi quadre (`[incredulous]`, `[confident]`, `[serious]`, `[excited]`, `[cheerfully]`): energica ed esplosiva nei punti giusti, **mai urlata**. Scarica l'mp3 in `audio_in/NN.mp3`.
@@ -54,11 +58,11 @@ Serve `ffmpeg`.
    Indirizzi: `https://raw.githubusercontent.com/riccardolocatelli11/iki-reel/video/rNN.mp4` e, per la copertina, `.../video/rNN.jpg`
 10. **Pubblicazione.** Composio, account `instagram_orthis-postil`, `ig_user_id 29071061522583210`:
     `INSTAGRAM_POST_IG_USER_MEDIA` (`video_url`, `cover_url` = l'indirizzo di `rNN.jpg`, `media_type: REELS`, `caption`, `share_to_feed: true`), poi attendi `FINISHED` con `INSTAGRAM_GET_POST_STATUS` (servono circa 4 minuti: riprova ogni 30-40 secondi, fino a 8 minuti), poi `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH`. Prendi il permalink con `INSTAGRAM_GET_IG_MEDIA`.
-11. **Chiusura.** Aggiungi una riga a `storico.md`, fai commit di `rNN.py`, `audio_in/NN.*` e `storico.md` su `main`.
+11. **Chiusura.** Aggiungi una riga a `storico.md` (con l'Area), fai commit di `rNN.py`, `audio_in/NN.*`, `storico.md`, `metriche.md` e dell'eventuale `dm/PAROLA.md` su `main`.
 
 ## Didascalia
 
-Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la regola. Poi la CTA dello stesso tipo del video: «Scrivi PAROLA nei commenti e ti mando come funziona 👇» per i reel con la parola, oppure «📌 Salvalo per la prossima scheda e giralo a un collega PT.» per i reel «salva» (nei reel «salva» aggiungi anche una riga «iki · L'app del personal trainer — prova gratuita, link in bio»). In fondo 5 hashtag: `#personaltrainer #personaltraineritalia #allenamento #coaching #ikiapp` (cambiane 1-2 in base al tema).
+Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la regola. Poi la CTA dello stesso tipo del video: «Scrivi PAROLA nei commenti e ti mando come funziona in DM 👇» per i reel con la parola, oppure «📩 Mandalo al collega che lo fa ancora.» per i reel «invia» (in questi aggiungi anche una riga «iki · L'app del personal trainer — prova gratuita, link in bio»). Penultima riga, sempre: «🎙️ Voce di Riccardo generata con IA» (Meta chiede di dichiarare l'audio realistico generato con l'IA). In fondo 5 hashtag: `#personaltrainer #personaltraineritalia #allenamento #coaching #ikiapp` (cambiane 1-2 in base al tema).
 
 ## Cosa dicono i numeri (analisi del 23/11/2026)
 
@@ -67,8 +71,14 @@ Dati di Instagram sui contenuti dal 28/09 al 23/11/2026. Da ricontrollare ogni t
 - I reel «mito tecnico smentito» con gli omini fanno di solito 1.000-1.700 visualizzazioni, con il 33-45% che scorre via subito e 9-12 s di visione media. Il migliore in assoluto è la doppia progressione (4.720 visualizzazioni, 61 salvataggi, 19 condivisioni): una regola concreta da riusare.
 - I reel emotivi o generici (bilancia, specchio, «il corpo è pigro») e quelli che partono dall'app: 75-80% scorre via subito, 250-800 visualizzazioni.
 - I promo e i video di marchio: 85-92% scorre via subito e la visione media è di 2-3 s, perché il problema compare solo dopo il logo.
-- I post nel feed (immagini e caroselli) arrivano a circa 25 persone: non farli.
-- La CTA «scrivi PAROLA nei commenti» ha portato 2 commenti in tutto: per questo ora si alterna con la CTA «salva» (passo 3). Quando ci saranno almeno 4 reel per tipo, confronta salvataggi, condivisioni e commenti e scrivi qui quale rende di più.
+- I vecchi post nel feed (immagini e caroselli pubblicitari sull'app) arrivavano a circa 25 persone. I caroselli **educativi** del martedì sono un test diverso: Instagram dice che oggi i caroselli portano più coinvolgimento e salvataggi; misurali in `metriche.md` come i reel.
+- La CTA «scrivi PAROLA nei commenti» ha portato 2 commenti in tutto: per questo ora si alterna con la CTA «invia» (passo 3), e chi commenta riceve subito il messaggio in DM (`dm/`). Quando ci saranno almeno 4 reel per tipo, confronta in `metriche.md` invii, salvataggi, commenti e follower e scrivi qui quale rende di più.
+- Il 98% della copertura (3.854 su 3.920 in 30 giorni) è di non follower, ma i follower non crescono: il pubblico raggiunto dai temi di allenamento è in buona parte fatto di non PT. Per questo l'alternanza Mestiere / Allenamento (passo 1).
+- Il segnale più legato alla copertura nei nostri dati è la quota di chi scorre via (correlazione −0,56): il gancio a domanda + smentita funziona, non cambiarlo.
+
+## Metriche
+
+`metriche.md` ha una riga per reel, misurata **7 giorni dopo** la pubblicazione con `INSTAGRAM_GET_IG_MEDIA_INSIGHTS` (`metric`: views, reach, likes, comments, saved, shares, ig_reels_avg_watch_time, reels_skip_rate). L'id del media si trova con `INSTAGRAM_GET_IG_USER_MEDIA` confrontando il permalink. Colonne: N, data, area, CTA, views, copertura, skip %, visione media (s), invii, salvataggi, commenti, invii ogni 1.000 di copertura. A ogni nuovo reel aggiungi le righe mancanti, poi rileggi la tabella per scegliere tema e area.
 
 ## Regole fisse
 
@@ -77,6 +87,25 @@ Dati di Instagram sui contenuti dal 28/09 al 23/11/2026. Da ricontrollare ogni t
 - Non inventare funzioni, numeri di clienti o risultati. I dati nelle schermate sono esempi (cliente «Marco»).
 - Le affermazioni tecniche sull'allenamento devono essere prudenti e condivise («quasi», «di solito»), mai consigli medici.
 - Se un passaggio fallisce (voce, render, hosting, Instagram), **non pubblicare a metà e non ritentare all'infinito**: scrivi cosa è successo e fermati. Mai due reel nello stesso giorno.
+
+## Carosello del martedì (ogni settimana)
+
+Formato fisso, 1080×1350, stesso stile dei reel (fondo carta, gancio rosso, omini). Motore `carosello.py`, uno script `cNN.py` per carosello (modello: `c01.py`), storico in `caroselli.md`.
+
+1. **Tema.** Un contenuto **da salvare e mandare a un collega**: checklist, «le N cose da…», errori da evitare, con regole pratiche. Area **Mestiere** quasi sempre (gestione clienti, colloqui, pagamenti, rinnovi, comunicazione), ogni tanto Allenamento dal punto di vista del PT. Non ripetere i temi di `caroselli.md` né quelli dei reel delle ultime 2 settimane.
+2. **Fedeltà all'app.** La slide `iki` mostra una funzione trovata nel codice di gestionale-pt (`src/`), con etichette reali. Se nessuna funzione c'entra davvero, cambia tema.
+3. **Struttura.** 1 copertina (`cover`: gancio a domanda, 2 righe, + sottotitolo con la promessa), 4-6 slide `point` (titolo breve, testo di 2-5 righe, un'icona), 1 slide `iki`, 1 slide `end` (Mandalo a un collega). Affermazioni prudenti («di solito»), mai consigli medici.
+4. **Controllo.** `python3 cNN.py sheet` → guarda `build/csheet_NN.png`: niente testo tagliato o sovrapposto, schermata leggibile. Poi `python3 cNN.py` → `out/carosello_NN/01.jpg …`.
+5. **Immagini online.** Ramo `carosello` (NON il ramo `video`, che deve tenere il reel del giorno prima per TikTok):
+   ```bash
+   rm -rf /tmp/car && mkdir /tmp/car && cd /tmp/car && git init -q -b carosello
+   for f in <repo>/out/carosello_NN/*.jpg; do cp "$f" "cNN_$(basename $f)"; done
+   git add . && git commit -q -m "Carosello NN" && git remote add origin https://github.com/riccardolocatelli11/iki-reel && git push -f origin carosello
+   ```
+   Indirizzi: `https://raw.githubusercontent.com/riccardolocatelli11/iki-reel/carosello/cNN_01.jpg` …
+6. **Pubblicazione.** Per ogni immagine `INSTAGRAM_POST_IG_USER_MEDIA` con `image_url` e `is_carousel_item: true` (senza caption); poi il contenitore del carosello con `children` (gli id, in ordine) e `caption` (`INSTAGRAM_CREATE_CAROUSEL_CONTAINER`, oppure `INSTAGRAM_POST_IG_USER_MEDIA` con `media_type: CAROUSEL`); poi `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH` e permalink con `INSTAGRAM_GET_IG_MEDIA`.
+7. **Didascalia.** Prima riga: il gancio + ❌. Poi 2-3 righe che riassumono le regole. Poi «📩 Mandalo al collega che…», la riga «iki · L'app del personal trainer — prova gratuita, link in bio» e 5 hashtag.
+8. **Chiusura.** Riga in `caroselli.md` (numero, data, tema, funzione iki, permalink); commit su `main` di `cNN.py` e `caroselli.md`.
 
 ## Promo del giovedì (ogni due settimane)
 
@@ -97,7 +126,7 @@ Serve anche `npm`/Playwright (già installato nell'ambiente: `require('playwrigh
 
 ### Procedura
 
-1. **Primo secondo.** Il promo 01 ha perso l'86% delle persone nel primo secondo, perché il gancio compare solo dopo il logo (circa 3 s). Finché il modello non mostra il problema già dal primo fotogramma, scegli `hook.lines` brevissime e d'impatto e non allungare l'intro.
+1. **Primo secondo.** Il promo 01 ha perso l'86% delle persone nel primo secondo, perché il gancio compariva solo dopo il logo (circa 3 s). Dal 23/11/2026 il modello parte con il gancio già al primo fotogramma (`coldOpen`, predefinito; `"coldOpen": false` nel json rimette il logo in apertura, da non usare). Scegli `hook.lines` brevissime e d'impatto: la prima riga è quella che decide se restano.
 1. **Quando.** Si pubblica un giovedì sì e uno no. Se in `promo/storico.md` c'è un promo di meno di 10 giorni fa, oggi non tocca: fermati e dillo in una riga. Mai due video nello stesso giorno.
 2. **Tema.** Se in `promo/` c'è già un `pNN.json` pronto che non compare in `promo/storico.md` (preparato in anticipo), usa quello: ricontrolla solo che schermate e frasi siano ancora fedeli all'app e vai al passo 5. Altrimenti scegli una sola area di iki per promo (pagamenti, schede, clienti e anamnesi, progressi e check, dashboard e incassi, allenamento del cliente con timer e video esercizi, chat, novità rilasciate da poco). Non ripetere quelle di `promo/storico.md`; le novità recenti dell'app hanno la precedenza.
 3. **Fedeltà all'app.** Clona `riccardolocatelli11/gestionale-pt`. Le schermate sono `public/pt-vetrina-<NOME>.png` (aggiornate da Riccardo): usa solo quelle. Ogni frase e ogni card deve corrispondere a qualcosa che **trovi nel codice** di `src/` (etichette, testi dei bottoni, comportamento). Se una funzione non c'è nelle schermate o nel codice, non mostrarla. Se le schermate disponibili non bastano per un tema, scegli un altro tema.
