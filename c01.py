@@ -28,7 +28,7 @@ def anamnesi_pt_screen(ctx, w, h):
             ('SALUTE', (('Infortuni passati', 'Sì'), ('Dettagli infortuni', 'Distorsione caviglia dx, 2023'))))
     y = 300
     for tit, rows in secs:
-        text(ctx, tit, 40, y, 18, FONT, GRAY, anchor='l'); y += 20
+        text(ctx, tit, 40, y, 18, FONT, RED, anchor='l'); y += 20
         for k, (lab, v) in enumerate(rows):
             rrect(ctx, 30, y, w - 60, 78, 12); col(ctx, (.95, .94, .92)); ctx.fill()
             text(ctx, lab, 50, y + 24, 19, FONTB, GRAY, anchor='l')
