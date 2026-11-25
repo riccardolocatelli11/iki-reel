@@ -62,7 +62,7 @@ Serve `ffmpeg`.
 
 ## Didascalia
 
-Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la regola. Poi la CTA dello stesso tipo del video: «Scrivi PAROLA nei commenti e ti mando come funziona in DM 👇» per i reel con la parola, oppure «📩 Mandalo al collega che lo fa ancora.» per i reel «invia» (in questi aggiungi anche una riga «iki · L'app del personal trainer — prova gratuita, link in bio»). Penultima riga, sempre: «🎙️ Voce di Riccardo generata con IA» (Meta chiede di dichiarare l'audio realistico generato con l'IA). In fondo 5 hashtag: `#personaltrainer #personaltraineritalia #allenamento #coaching #ikiapp` (cambiane 1-2 in base al tema).
+Prima riga = la domanda del gancio + la smentita con ❌. Poi 2-3 righe con la regola. Poi la CTA dello stesso tipo del video: «Scrivi PAROLA nei commenti e ti mando come funziona in DM 👇» per i reel con la parola, oppure «📩 Mandalo al collega che lo fa ancora.» per i reel «invia» (in questi aggiungi anche una riga «iki · L'app del personal trainer — prova gratuita, link in bio»). Penultima riga, sempre: «🎙️ Voce IA» (breve, ma non toglierla: Meta e TikTok chiedono di dichiarare l'audio realistico generato con l'IA; su TikTok va attivata anche l'etichetta «Contenuto generato dall'IA» al caricamento). In fondo 5 hashtag: `#personaltrainer #personaltraineritalia #allenamento #coaching #ikiapp` (cambiane 1-2 in base al tema).
 
 ## Cosa dicono i numeri (analisi del 23/11/2026)
 
