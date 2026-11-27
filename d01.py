@@ -4,7 +4,7 @@ from props4 import *
 
 TITLE = 'Documentario 01 - Il richiamo notturno'
 HOOK = "L'ERRORE\nDELLE 23:47"
-LOOP = False; TAIL = 1.0
+LOOP = False; TAIL = 1.4
 SENT = [
     ("Eccolo: il personal trainer, nel suo habitat, alle ventitré e quarantasette.", 's1', {'HABITAT', 'QUARANTASETTE'}, 0.15),
     ("Sta per commettere l'errore più grave della sua giornata.", 's2', {'ERRORE', 'GRAVE'}, 0.2),
@@ -263,7 +263,7 @@ def s7(ctx, tau, L, wt):
 
 def s8(ctx, tau, L, wt):
     cam(ctx, 1.0, 540, 1000)
-    tc = wt.get('CRUDELE', .5); tb = tc + 1.3          # stacco: vibra il telefono del narratore
+    tc = wt.get('CRUDELE', .5); tb = tc + 1.3          # stacco: arriva un messaggio al narratore
     if tau < tb:
         floor(ctx, G)
         fig(ctx, 'pt', lambda t: P(t=0, h=3 * math.sin(t * 2), ra1=20, ra2=10, la1=-20, la2=-10),
@@ -274,26 +274,68 @@ def s8(ctx, tau, L, wt):
         grass(ctx, 20, 1060, G + 40, tau, h=170, n=18, seed=13)
         species_card(ctx, prog(tau, tc - .4, tc), 'LA NATURA', 'è crudele.')
     else:
-        narrator_phone(ctx, tau - tb, 0, 0)
+        narrator_phone(ctx, tau - tb, 0)
 
-def narrator_phone(ctx, t, reply, cough):
-    """Il telefono del narratore: gli scrive il SUO cliente."""
+def narrator_phone(ctx, t, reply):
+    """Il telefono del narratore: gli scrive il SUO cliente. Nessuna vibrazione, solo il messaggio."""
     col(ctx, (.03, .03, .05)); ctx.paint()
     k = eout(prog(t, 0, .35))
-    buzz = math.sin(t * 70) * 7 * (1 - prog(t, .2, 1.3))
-    sh = math.sin(t * 45) * 10 * cough
-    ctx.save(); ctx.translate(540 + buzz + sh, lerp(2400, 1150, k) + sh * .6)
+    ctx.save(); ctx.translate(540, lerp(2400, 1150, k))
     phone(ctx, 0, 0, 640, 1120, wa_screen([('Scusi, possiamo\nspostare il\ndocumentario\nalle 6?', 'l'), ('Sì', 'r')], 1 + reply, title='CLIENTE', time='23:58'))
     ctx.restore()
 
+def mic_stand(ctx, x, sway=0.0):
+    """Microfono da studio su asta: il narratore c'era davvero."""
+    base = (x, G); top = (x + sway * 40, G - 560)
+    poly(ctx, [(x - 70, G), (x + 70, G)], 8); poly(ctx, [base, top], 7)
+    ctx.save(); ctx.translate(*top); ctx.rotate(-.35 + sway * .3)
+    rrect(ctx, -32, -95, 64, 120, 30); fill_stroke(ctx, (.35, .35, .38), 6)
+    for i in range(4): poly(ctx, [(-22, -70 + i * 22), (22, -70 + i * 22)], 3)
+    ctx.restore()
+
+def studio(ctx):
+    col(ctx, (.13, .12, .12)); ctx.paint()
+    g = cairo.RadialGradient(540, 1150, 60, 540, 1150, 720)
+    g.add_color_stop_rgba(0, 1, .95, .85, 1); g.add_color_stop_rgba(.75, .55, .5, .45, 1); g.add_color_stop_rgba(1, .13, .12, .12, 1)
+    ctx.set_source(g); ctx.arc(540, 1150, 720, 0, 2 * math.pi); ctx.fill()
+    floor(ctx, G)
+
+def narrator(ctx, t, ts, tsc):
+    """Il narratore in studio, telefono in mano: due colpi di tosse, «Scusate», scappa."""
+    studio(ctx)
+    c1 = prog(t, ts + .5, ts + .62) * (1 - prog(t, ts + .95, ts + 1.1))
+    c2 = prog(t, ts + 1.2, ts + 1.32) * (1 - prog(t, ts + 1.65, ts + 1.8))
+    cough = max(c1, c2); jolt = math.sin(t * 50) * 4 * cough
+    run = prog(t, tsc + .8, tsc + 1.5)
+    x = lerp(600, 1450, eio(run) * .2 + run * .8)
+    def pose(tt):
+        if t > tsc + .75:
+            p = walk((tt - tsc) * 30, fx=1, amp=1.9); p.update(ra1=40, ra2=150, t=26, h=-10); return p
+        lean = 18 * cough
+        la = dict(la1=lerp(-14, 25, cough), la2=lerp(-8, 175, cough))
+        return P(t=lean + jolt, h=8 * cough, ra1=38, ra2=150, **la)
+    if t < tsc - .1:
+        face = dict(eyes='wince' if cough > .3 else 'open', mouth='flat' if cough > .3 else 'smirk', brows='worried', look=(.4, .6) if cough < .3 else (0, 0))
+    elif t < tsc + .75:
+        face = dict(eyes='open', mouth='wavy', brows='worried', look=(0, 0))
+    else:
+        face = dict(eyes='wide', mouth='wavy', brows='worried', look=(.6, 0))
+    mic_stand(ctx, 330, sway=.25 * math.sin((t - tsc - .9) * 9) * math.exp(-max(0, t - tsc - .9) * 2) * (t > tsc + .9))
+    A = fig(ctx, 'narr', pose, face, x, t, fx=-.1 if run == 0 else .3, seed=2, U_=U * .9)
+    small_phone(ctx, A['hR'], rot=.4, glow=1, s=.7)
+    if prog(t, tsc - .1, tsc + .2) > 0 and run < .3:
+        drop(ctx, A['head'][0] + 70, A['head'][1] - 40, 1.1, prog(t, tsc - .1, tsc + .2))
+    species_card(ctx, prog(t, ts + .4, ts + .7) * (1 - prog(t, tsc + .7, tsc + 1.0)), 'IL NARRATORE', 'Homo sapiens')
+
 def s9(ctx, tau, L, wt):
     ts = wt.get('SÌ', .1); tsc = wt.get('SCUSATE', L - .8)
-    reply = prog(tau, ts, ts + .2)
-    cough = 1.0 if (.6 < tau - ts < 1.0) or (1.2 < tau - ts < 1.6) else 0.0
-    if tau < tsc + .75:
-        narrator_phone(ctx, 3 + tau, reply, cough)
+    reply = prog(tau, ts - .15, ts + .05)                # il «Sì» lo scrive soltanto
+    if tau < ts + .45:
+        narrator_phone(ctx, 3 + tau, reply)
+    elif tau < tsc + 1.6:
+        narrator(ctx, tau, ts, tsc)
     else:
-        col(ctx, (0, 0, 0)); ctx.paint()                # stacco al nero
+        col(ctx, (0, 0, 0)); ctx.paint()                # fine
 
 # ---------------------------------------------------------------- colonna sonora da documentario
 import engine as _eng
@@ -363,7 +405,7 @@ def _timp(f=None):
     return (np.sin(2 * np.pi * np.cumsum(60 + 30 * np.exp(-t * 12)) / SR) + .3 * _eng._lp(_rng2.standard_normal(len(t)), 300)) * np.exp(-t * 2.6) * np.minimum(1, t * 300)
 
 def file_music(N, total):
-    """Musica orchestrale generata (audio_in/d01_music.mp3); si interrompe di colpo quando vibra il telefono del narratore."""
+    """Musica orchestrale generata (audio_in/d01_music.mp3); si interrompe di colpo quando arriva il messaggio al narratore."""
     p = os.path.join(HERE, 'audio_in', 'd01_music.mp3')
     if not os.path.exists(p): return doc_music(N, total)
     a = load_voice(p); a = a[:N]; out = np.zeros(N); out[:len(a)] = a
@@ -376,6 +418,12 @@ def file_music(N, total):
 
 _eng.SYNTH.update(crickets=_crickets, birds=_birds, swell=_swell, timp=_timp)
 _eng._music = file_music
+
+_caption = _eng.caption
+def _caption_no_si(ctx, t, words, scenes):
+    """Il «Sì» il narratore lo scrive e basta: niente sottotitolo."""
+    return _caption(ctx, t, [w for w in words if not w[1].upper().startswith('SÌ')], scenes)
+_eng.caption = _caption_no_si
 
 def letterbox(ctx, t):
     """Look da documentario: bande nere da cinema + grana della pellicola."""
@@ -412,7 +460,11 @@ def SFX(fx, at):
     fx('msg', at('s4', 'BRANCO', -.2), .25, f=800); fx('msg', at('s4', 'BRANCO', .25), .25, f=900); fx('msg', at('s4', 'QUALSIASI', -.3), .25, f=1000)
     fx('whoosh', at('s6', None), .3); fx('pop', at('s6', 'DISTURBARE', 0), .22, f=900)
     fx('msg', at('s7', 'RISPOSTA', -.5), .22, f=1000)
-    fx('file:vibra', at('s8', 'CRUDELE', 1.3), .9)
+    fx('msg', at('s8', 'CRUDELE', 1.3), .35, f=900)          # arriva il messaggio, niente vibrazione
+    for i in range(2): fx('tick', at('s9', 'SÌ', -.2 + i * .12), .22)   # scrive «Sì»
+    fx('pop', at('s9', 'SÌ', .05), .2, f=1000)
+    for i in range(6): fx('tick', at('s9', 'SCUSATE', .85 + i * .11), .3)  # scappa
+    fx('whoosh', at('s9', 'SCUSATE', 1.0), .3)
 
 if __name__ == '__main__':
     main(sys.modules[__name__], 'd01')
