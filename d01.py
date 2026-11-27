@@ -306,7 +306,6 @@ def boom_mic(ctx, sway=0.0):
     for i in range(5): poly(ctx, [(-28, 110 + i * 26), (28, 110 + i * 26)], 3, (.15, .15, .15))
     ctx.restore()
 
-HAIR_S = (.84, .85, .89)
 
 def host_extras(ctx, A, R, mood, t, sweat, run):
     """Tratti del narratore sull'omino: ciuffo argento, fazzoletto rosso, binocolo, rossore, sudore, scintilla."""
@@ -319,21 +318,7 @@ def host_extras(ctx, A, R, mood, t, sweat, run):
     poly(ctx, [(nk[0] - .28 * R, nk[1]), (nk[0] - .2 * R, by)], .05 * R * 2); poly(ctx, [(nk[0] + .28 * R, nk[1]), (nk[0] + .2 * R, by)], .05 * R * 2)
     for sx in (-1, 1):
         rrect(ctx, nk[0] + sx * .2 * R - .13 * R, by - .05 * R, .26 * R, .42 * R, .06 * R); fill_stroke(ctx, (.25, .25, .28), .08 * R)
-    # ciuffo argento a onda (vanitoso), al posto dei capellini
     ctx.save(); ctx.translate(*hc)
-    ctx.save(); ctx.translate(0, -.28 * R); ctx.scale(.92, .92)
-    ctx.move_to(-1.0 * R, -.15 * R); ctx.curve_to(-1.15 * R, -1.1 * R, -.4 * R, -1.75 * R, .4 * R, -1.7 * R)
-    ctx.curve_to(1.2 * R, -1.65 * R, 1.5 * R, -1.05 * R, 1.25 * R, -.7 * R)
-    ctx.curve_to(1.05 * R, -.45 * R, .85 * R, -.8 * R, .6 * R, -.8 * R)
-    ctx.curve_to(.1 * R, -.62 * R, -.5 * R, -.7 * R, -.82 * R, -.1 * R); ctx.close_path()
-    fill_stroke(ctx, HAIR_S, .085 * R * 2.2)
-    ctx.move_to(-.7 * R, -.95 * R); ctx.curve_to(-.4 * R, -1.45 * R, .5 * R, -1.5 * R, 1.05 * R, -1.05 * R)
-    col(ctx, (.6, .62, .68)); ctx.set_line_width(.05 * R); ctx.stroke()
-    ctx.move_to(-.5 * R, -.7 * R); ctx.curve_to(-.2 * R, -1.15 * R, .5 * R, -1.2 * R, .95 * R, -.85 * R)
-    col(ctx, (.6, .62, .68)); ctx.set_line_width(.05 * R); ctx.stroke()
-    ctx.move_to(1.1 * R, -.72 * R); ctx.curve_to(1.25 * R, -.45 * R, 1.1 * R, -.25 * R, .92 * R, -.28 * R)   # ciocca ribelle
-    col(ctx, INK); ctx.set_line_width(.07 * R); ctx.stroke()
-    ctx.restore()
     if mood in ('cough', 'sorry', 'panic'):
         for sx in (-1, 1):
             ell(ctx, sx * .5 * R, .2 * R, .16 * R, .08 * R); col(ctx, (.95, .45, .42), .6); ctx.fill()
@@ -393,7 +378,7 @@ def narrator(ctx, t, ts, tsc):
             y = 800 + i * 130; poly(ctx, [(x - 260 - i * 30, y), (x - 520 - i * 30, y)], 8, INK, .5 * (1 - run))
     sway = .25 * math.sin((t - tsc - .9) * 10) * math.exp(-max(0, t - tsc - .9) * 2.5) if t > tsc + .9 else 0
     boom_mic(ctx, sway)
-    species_card(ctx, prog(t, ts + .5, ts + .8) * (1 - prog(t, tsc + .6, tsc + .9)), 'IL NARRATORE', 'Homo sapiens televisivus', y=1580)
+    species_card(ctx, prog(t, ts + .5, ts + .8) * (1 - prog(t, tsc + .6, tsc + .9)), 'IL NARRATORE', 'Homo sapiens', y=1580)
 
 def s9(ctx, tau, L, wt):
     ts = wt.get('SÌ', .1); tsc = wt.get('SCUSATE', L - .8)
