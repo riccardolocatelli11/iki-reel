@@ -284,53 +284,59 @@ def narrator_phone(ctx, t, reply):
     phone(ctx, 0, 0, 640, 1120, wa_screen([('Scusi, possiamo\nspostare il\ndocumentario\nalle 6?', 'l'), ('Sì', 'r')], 1 + reply, title='CLIENTE', time='23:58'))
     ctx.restore()
 
-def mic_stand(ctx, x, sway=0.0):
-    """Microfono da studio su asta: il narratore c'era davvero."""
-    base = (x, G); top = (x + sway * 40, G - 560)
-    poly(ctx, [(x - 70, G), (x + 70, G)], 8); poly(ctx, [base, top], 7)
-    ctx.save(); ctx.translate(*top); ctx.rotate(-.35 + sway * .3)
-    rrect(ctx, -32, -95, 64, 120, 30); fill_stroke(ctx, (.35, .35, .38), 6)
-    for i in range(4): poly(ctx, [(-22, -70 + i * 22), (22, -70 + i * 22)], 3)
+def studio(ctx, onair=1.0):
+    """Lo studio del narratore: luce calda, insegna ON AIR."""
+    col(ctx, (.13, .11, .10)); ctx.paint()
+    g = cairo.RadialGradient(560, 1150, 60, 560, 1150, 760)
+    g.add_color_stop_rgba(0, 1, .93, .80, 1); g.add_color_stop_rgba(.7, .55, .45, .36, 1); g.add_color_stop_rgba(1, .13, .11, .10, 1)
+    ctx.set_source(g); ctx.arc(560, 1150, 760, 0, 2 * math.pi); ctx.fill()
+    for i in range(7):                                                            # pannelli fonoassorbenti
+        x = 40 + i * 150; rrect(ctx, x, 180, 120, 120, 10); col(ctx, (0, 0, 0), .18); ctx.fill()
+    rrect(ctx, 70, 470, 250, 90, 14); fill_stroke(ctx, (.85, .1, .1) if onair > .5 else (.3, .12, .12), 6)
+    if onair > .5:
+        col(ctx, RED, .25); rrect(ctx, 50, 450, 290, 130, 24); ctx.fill()
+    text(ctx, 'ON AIR', 195, 517, 50, FONT, WHITE if onair > .5 else (.5, .4, .4))
+
+def boom_mic(ctx, sway=0.0):
+    """Microfono da studio su braccio che scende dall'alto a sinistra."""
+    poly(ctx, [(-20, 640), (250, 760)], 16); poly(ctx, [(-20, 640), (250, 760)], 8, (.4, .4, .42))
+    ctx.save(); ctx.translate(250, 760); ctx.rotate(.5 + sway)
+    poly(ctx, [(0, 0), (0, 80)], 8)
+    rrect(ctx, -40, 80, 80, 170, 38); fill_stroke(ctx, (.32, .32, .35), 7)
+    for i in range(5): poly(ctx, [(-28, 110 + i * 26), (28, 110 + i * 26)], 3, (.15, .15, .15))
     ctx.restore()
 
-def studio(ctx):
-    col(ctx, (.13, .12, .12)); ctx.paint()
-    g = cairo.RadialGradient(540, 1150, 60, 540, 1150, 720)
-    g.add_color_stop_rgba(0, 1, .95, .85, 1); g.add_color_stop_rgba(.75, .55, .5, .45, 1); g.add_color_stop_rgba(1, .13, .12, .12, 1)
-    ctx.set_source(g); ctx.arc(540, 1150, 720, 0, 2 * math.pi); ctx.fill()
-    floor(ctx, G)
-
 def narrator(ctx, t, ts, tsc):
-    """Il narratore in studio, telefono in mano: due colpi di tosse, «Scusate», scappa."""
-    studio(ctx)
-    c1 = prog(t, ts + .5, ts + .62) * (1 - prog(t, ts + .95, ts + 1.1))
-    c2 = prog(t, ts + 1.2, ts + 1.32) * (1 - prog(t, ts + 1.65, ts + 1.8))
-    cough = max(c1, c2); jolt = math.sin(t * 50) * 4 * cough
-    run = prog(t, tsc + .8, tsc + 1.5)
-    x = lerp(600, 1450, eio(run) * .2 + run * .8)
-    def pose(tt):
-        if t > tsc + .75:
-            p = walk((tt - tsc) * 30, fx=1, amp=1.9); p.update(ra1=40, ra2=150, t=26, h=-10); return p
-        lean = 18 * cough
-        la = dict(la1=lerp(-14, 25, cough), la2=lerp(-8, 175, cough))
-        return P(t=lean + jolt, h=8 * cough, ra1=38, ra2=150, **la)
-    if t < tsc - .1:
-        face = dict(eyes='wince' if cough > .3 else 'open', mouth='flat' if cough > .3 else 'smirk', brows='worried', look=(.4, .6) if cough < .3 else (0, 0))
-    elif t < tsc + .75:
-        face = dict(eyes='open', mouth='wavy', brows='worried', look=(0, 0))
+    """Il narratore (host.py) in studio: compiaciuto, due colpi di tosse, «Scusate», scappa."""
+    from host import draw_host
+    c1 = (ts + 1.30, ts + 1.80); c2 = (ts + 2.00, ts + 2.45)
+    cough = (c1[0] < t < c1[1]) or (c2[0] < t < c2[1])
+    run = prog(t, tsc + .8, tsc + 1.3)
+    studio(ctx, onair=0 if run > .2 else 1)
+    if run > 0:
+        mood = 'panic'
+    elif t >= tsc - .15:
+        mood = 'sorry'
+    elif cough:
+        mood = 'cough'
+    elif t > ts + 1.3:
+        mood = 'sorry'
     else:
-        face = dict(eyes='wide', mouth='wavy', brows='worried', look=(.6, 0))
-    mic_stand(ctx, 330, sway=.25 * math.sin((t - tsc - .9) * 9) * math.exp(-max(0, t - tsc - .9) * 2) * (t > tsc + .9))
-    A = fig(ctx, 'narr', pose, face, x, t, fx=-.1 if run == 0 else .3, seed=2, U_=U * .9)
-    small_phone(ctx, A['hR'], rot=.4, glow=1, s=.7)
-    if prog(t, tsc - .1, tsc + .2) > 0 and run < .3:
-        drop(ctx, A['head'][0] + 70, A['head'][1] - 40, 1.1, prog(t, tsc - .1, tsc + .2))
-    species_card(ctx, prog(t, ts + .4, ts + .7) * (1 - prog(t, tsc + .7, tsc + 1.0)), 'IL NARRATORE', 'Homo sapiens')
+        mood = 'smug'
+    jolt = math.sin(t * 55) * 10 if cough else 0
+    x = 560 + eio(run) * 1100
+    draw_host(ctx, t, mood, x=x, lean=.25 * run, jolt=jolt, sweat=prog(t, tsc - .15, tsc + .1))
+    if run > 0:                                                                   # linee di velocità
+        for i in range(5):
+            y = 800 + i * 160; poly(ctx, [(x - 420 - i * 40, y), (x - 650 - i * 40, y)], 8, INK, .5 * (1 - run))
+    sway = .25 * math.sin((t - tsc - .9) * 10) * math.exp(-max(0, t - tsc - .9) * 2.5) if t > tsc + .9 else 0
+    boom_mic(ctx, sway)
+    species_card(ctx, prog(t, ts + .5, ts + .8) * (1 - prog(t, tsc + .6, tsc + .9)), 'IL NARRATORE', 'Homo sapiens televisivus', y=1580)
 
 def s9(ctx, tau, L, wt):
     ts = wt.get('SÌ', .1); tsc = wt.get('SCUSATE', L - .8)
     reply = prog(tau, ts - .15, ts + .05)                # il «Sì» lo scrive soltanto
-    if tau < ts + .45:
+    if tau < ts + .35:
         narrator_phone(ctx, 3 + tau, reply)
     elif tau < tsc + 1.6:
         narrator(ctx, tau, ts, tsc)
@@ -463,6 +469,7 @@ def SFX(fx, at):
     fx('msg', at('s8', 'CRUDELE', 1.3), .35, f=900)          # arriva il messaggio, niente vibrazione
     for i in range(2): fx('tick', at('s9', 'SÌ', -.2 + i * .12), .22)   # scrive «Sì»
     fx('pop', at('s9', 'SÌ', .05), .2, f=1000)
+    fx('pop', at('s9', 'SÌ', .55), .12, f=2600)                # scintilla sui denti
     for i in range(6): fx('tick', at('s9', 'SCUSATE', .85 + i * .11), .3)  # scappa
     fx('whoosh', at('s9', 'SCUSATE', 1.0), .3)
 
